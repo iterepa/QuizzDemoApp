@@ -3,6 +3,7 @@ package com.frogiri.demo.service;
 import com.frogiri.demo.Model.Question;
 import com.frogiri.demo.Model.QuestionWrapper;
 import com.frogiri.demo.Model.Quiz;
+import com.frogiri.demo.Model.Response;
 import com.frogiri.demo.dao.QuestionDao;
 import com.frogiri.demo.dao.QuizDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,26 @@ import java.util.Optional;
 @Service
 public class QuizService {
     @Autowired
+    static
     QuizDao quizDao;
 
     @Autowired
     QuestionDao questionDao;
+
+    public static ResponseEntity<Integer> calculateResult(Integer id, List<Response> responses) {
+        Quiz quiz = quizDao.findById(id).get();
+        List<Question> questions = quiz.getQuestions();
+        int right = 0;
+        int i = 0;
+        for(Response response : responses){
+            if(response.getResponse().equals(questions.get(i).getRightAnswer())){
+                right++;
+            }
+
+            i++;
+        }
+        return new ResponseEntity<>(right, HttpStatus.OK);
+    }
 
     public ResponseEntity<String> createQuiz(String category, int numQ, String title) {
 
